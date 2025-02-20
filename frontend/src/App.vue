@@ -2,7 +2,8 @@
 import { ref, onMounted, computed } from 'vue'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
-import { Solar } from 'lunar-typescript'
+import { Solar, Lunar } from 'lunar-typescript'
+import { FullScreen, Close } from '@element-plus/icons-vue'
 
 dayjs.locale('zh-cn')
 
@@ -30,8 +31,29 @@ setInterval(() => {
 // 农历信息
 const lunarInfo = computed(() => {
   const solar = Solar.fromDate(currentDate.value.toDate())
-  return solar.getLunar()
+  const lunar = solar.getLunar()
+  return `${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`
 })
+
+// 获取节气信息
+const getSolarTermInfo = () => {
+  const lunar = Lunar.fromDate(currentTime.value.toDate())
+  const currentTerm = lunar.getCurrentJieQi()
+  const nextTerm = lunar.getNextJieQi()
+  
+  if (currentTerm) {
+    return `今日节气：${currentTerm.getName()}`
+  } else if (nextTerm) {
+    // 计算距离下一个节气的天数
+    const today = dayjs()
+    // 获取下一个节气的阳历日期
+    const nextTermSolar = nextTerm.getSolar()
+    const nextTermDate = dayjs(new Date(nextTermSolar.getYear(), nextTermSolar.getMonth() - 1, nextTermSolar.getDay()))
+    const days = nextTermDate.diff(today, 'day')
+    return `距离${nextTerm.getName()}还有${days}天`
+  }
+  return ''
+}
 
 // 生成日历数据
 const calendarDays = computed(() => {
@@ -123,15 +145,20 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
     <div class="clock-section">
       <el-button 
         class="fullscreen-btn"
-        :icon="isFullscreen ? 'FullscreenExit' : 'FullScreen'"
         @click="toggleFullscreen"
       >
-        <span class="btn-text">{{ isFullscreen ? '退出' : '全屏' }}</span>
+        <el-icon class="btn-icon">
+          <component :is="isFullscreen ? Close : FullScreen" />
+        </el-icon>
+        <span class="btn-text">{{ isFullscreen ? '退出全屏' : '全屏' }}</span>
       </el-button>
       <div class="center-content">
         <div class="date-info">
           <div class="weekday">{{ currentTime.format('dddd') }}</div>
-          <div class="lunar">{{ lunarInfo.toString() }}</div>
+          <div class="lunar-info">
+            <span class="lunar">{{ lunarInfo }}</span>
+            <span class="solar-term">{{ getSolarTermInfo() }}</span>
+          </div>
         </div>
         <div class="time-display">
           <div class="hours-minutes">{{ currentTime.format('HH:mm') }}</div>
@@ -276,16 +303,19 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
   position: absolute;
   top: 15px;
   right: 15px;
-  padding: 8px 12px;
+  padding: 8px 16px;
   font-size: 14px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #e4e7ed;
   transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 4px;
   z-index: 10;
+  min-width: 100px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #606266;
 }
 
 .fullscreen-btn:hover {
@@ -296,10 +326,15 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
   box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
 }
 
+.btn-icon {
+  font-size: 16px;
+  color: currentColor;
+}
+
 .btn-text {
-  display: inline-block;
-  min-width: 2em;
   text-align: center;
+  white-space: nowrap;
+  color: currentColor;
 }
 
 .date-info {
@@ -318,10 +353,24 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
   letter-spacing: 4px;
 }
 
-.lunar {
+.lunar-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
   font-size: 16px;
   color: #606266;
-  letter-spacing: 1px;
+}
+
+.lunar, .solar-term {
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  transition: all 0.3s ease;
+}
+
+.solar-term {
+  font-weight: 500;
 }
 
 .time-display {
