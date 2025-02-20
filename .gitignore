@@ -1,0 +1,52 @@
+# Frontend
+frontend/node_modules
+frontend/.vite
+frontend/dist
+frontend/coverage
+frontend/.env
+frontend/.env.*
+frontend/logs
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/.pnpm-store
+frontend/.DS_Store
+
+# Backend
+backend/dist
+backend/cal-gui
+backend/cal-gui.exe
+backend/cal-gui.log
+backend/*.log
+backend/tmp
+backend/.env
+backend/.env.*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+*.local
+
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# System Files
+Thumbs.db
+.DS_Store
+*.tmp
+*.bak
+*.swp
