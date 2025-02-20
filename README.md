@@ -2,6 +2,10 @@
 
 A secondary work display interface optimized for small screens, providing reminders for time, tasks, and dates.
 
+## Screenshot
+
+![Mini Screen Calendar Screenshot](images/screenshot.png)
+
 ![Screen Size](https://img.shields.io/badge/Screen-1280x400-blue)
 ![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi-red)
 ![Frontend](https://img.shields.io/badge/Frontend-Vue%203-brightgreen)
