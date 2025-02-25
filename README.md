@@ -19,6 +19,20 @@ A secondary work display interface optimized for small screens, providing remind
 - ✅ Todo list management with due date tracking
 - 🖥️ Optimized for 1280x400 horizontal displays
 - 🎨 Modern UI with gradient backgrounds and smooth animations
+- 🍅 Pomodoro timer with start/pause and reset functions
+
+## Roadmap
+
+Upcoming features and improvements:
+
+- 📱 Remote todo management
+  - Add/edit/delete todos from other devices
+  - Real-time synchronization
+
+- ⏳ Countdown timer for important dates
+  - Custom event countdown
+  - Anniversary reminders
+  - Holiday countdown
 
 ## Tech Stack
 
