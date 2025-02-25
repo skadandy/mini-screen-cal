@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import { Solar, Lunar } from 'lunar-typescript'
 import { FullScreen, Close } from '@element-plus/icons-vue'
+import PomodoroTimer from './components/PomodoroTimer.vue'
 
 dayjs.locale('zh-cn')
 
@@ -164,6 +165,7 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
           <div class="hours-minutes">{{ currentTime.format('HH:mm') }}</div>
           <div class="seconds">{{ currentTime.format('ss') }}</div>
         </div>
+        <PomodoroTimer />
       </div>
     </div>
 
@@ -275,111 +277,62 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
 
 /* 时钟部分样式 */
 .clock-section {
-  flex: 0 0 480px;
+  position: relative;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  position: relative;
   padding: 20px;
-  background: linear-gradient(145deg, #ffffff, #f5f7fa);
-  overflow: hidden;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .center-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  gap: 20px;
-}
-
-.fullscreen-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  padding: 8px 16px;
-  font-size: 14px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #e4e7ed;
-  transition: all 0.3s ease;
-  z-index: 10;
-  min-width: 100px;
-  display: inline-flex !important;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  color: #606266;
-}
-
-.fullscreen-btn:hover {
-  background: #409EFF;
-  color: white;
-  border-color: #409EFF;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
-}
-
-.btn-icon {
-  font-size: 16px;
-  color: currentColor;
-}
-
-.btn-text {
-  text-align: center;
-  white-space: nowrap;
-  color: currentColor;
+  gap: 10px;
+  padding: 10px;
 }
 
 .date-info {
-  text-align: center;
-  padding: 15px 30px;
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
 }
 
 .weekday {
-  font-size: 28px;
-  color: #303133;
-  font-weight: 500;
-  margin-bottom: 8px;
-  letter-spacing: 4px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
 }
 
 .lunar-info {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  font-size: 16px;
-  color: #606266;
+  gap: 10px;
+  font-size: 1rem;
+  color: #666;
 }
 
 .lunar, .solar-term {
-  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 4px 12px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.6);
-  transition: all 0.3s ease;
-}
-
-.solar-term {
-  font-weight: 500;
 }
 
 .time-display {
+  font-size: 3.5rem;
+  font-weight: bold;
   display: flex;
   align-items: baseline;
   justify-content: center;
   gap: 15px;
   background: rgba(255, 255, 255, 0.8);
-  padding: 20px 40px;
+  padding: 15px 30px;
   border-radius: 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
@@ -484,5 +437,44 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* 全屏按钮样式 */
+.fullscreen-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e4e7ed;
+  transition: all 0.3s ease;
+  z-index: 10;
+  min-width: 100px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #606266;
+}
+
+.fullscreen-btn:hover {
+  background: #409EFF;
+  color: white;
+  border-color: #409EFF;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
+}
+
+.btn-icon {
+  font-size: 16px;
+  color: currentColor;
+}
+
+.btn-text {
+  text-align: center;
+  white-space: nowrap;
+  color: currentColor;
 }
 </style>
