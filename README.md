@@ -4,7 +4,9 @@ A secondary work display interface optimized for small screens, providing remind
 
 ## Screenshot
 
-![Mini Screen Calendar Screenshot](images/screenshot.png)
+![Mini Screen Calendar Screenshot](images/Snipaste_2025-02-26_15-45-22.png)
+![Mini Screen Calendar Screenshot](images/Snipaste_2025-02-26_15-46-03.png)
+![Mini Screen Calendar Screenshot](images/Snipaste_2025-02-26_15-46-09.png)
 
 ![Screen Size](https://img.shields.io/badge/Screen-1280x400-blue)
 ![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi-red)
