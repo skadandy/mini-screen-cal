@@ -1,3 +1,71 @@
+<template>
+  <div class="container">
+    <!-- 左侧日历 -->
+    <div class="calendar">
+      <div class="calendar-header">
+        <el-button @click="currentDate = dayjs(currentDate).subtract(1, 'month')">上月</el-button>
+        <span>{{ currentDate.format('YYYY年MM月') }}</span>
+        <el-button @click="currentDate = dayjs(currentDate).add(1, 'month')">下月</el-button>
+      </div>
+      <div class="weekdays">
+        <div 
+          v-for="(day, index) in ['日', '一', '二', '三', '四', '五', '六']" 
+          :key="day" 
+          class="weekday"
+          :class="{ 'weekend': index === 0 || index === 6 }"
+        >
+          {{ day }}
+        </div>
+      </div>
+      <div class="days">
+        <div
+          v-for="(day, index) in calendarDays"
+          :key="index"
+          class="day"
+          :class="{
+            'current-month': day.isCurrentMonth,
+            'today': day.date.format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD'),
+            'weekend': day.date.day() === 0 || day.date.day() === 6
+          }"
+        >
+          {{ day.date.date() }}
+        </div>
+      </div>
+    </div>
+
+    <!-- 中间时钟和日期信息 -->
+    <div class="clock-section">
+      <el-button 
+        class="fullscreen-btn"
+        @click="toggleFullscreen"
+      >
+        <el-icon class="btn-icon">
+          <component :is="isFullscreen ? Close : FullScreen" />
+        </el-icon>
+        <span class="btn-text">{{ isFullscreen ? '退出全屏' : '全屏' }}</span>
+      </el-button>
+      <div class="center-content">
+        <div class="date-info">
+          <div class="lunar-info">
+            <span class="lunar">{{ lunarInfo }}</span>
+            <span class="solar-term">{{ getSolarTermInfo() }}</span>
+            <span class="holiday">{{ getNextHolidayInfo }}</span>
+          </div>
+          <div class="weekday">{{ currentTime.format('dddd') }}</div>
+        </div>
+        <div class="time-display">
+          <div class="hours-minutes">{{ currentTime.format('HH:mm') }}</div>
+          <div class="seconds">{{ currentTime.format('ss') }}</div>
+        </div>
+        <PomodoroTimer />
+      </div>
+    </div>
+
+    <!-- 右侧面板 -->
+    <RightPanel />
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import dayjs from 'dayjs'
@@ -6,6 +74,7 @@ import { Solar, Lunar } from 'lunar-typescript'
 import { FullScreen, Close } from '@element-plus/icons-vue'
 import PomodoroTimer from './components/PomodoroTimer.vue'
 import { getNextHoliday } from './utils/holidays'
+import RightPanel from './components/RightPanel.vue'
 
 dayjs.locale('zh-cn')
 
@@ -129,95 +198,13 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
 }
 </script>
 
-<template>
-  <div class="container">
-    <!-- 左侧日历 -->
-    <div class="calendar">
-      <div class="calendar-header">
-        <el-button @click="currentDate = dayjs(currentDate).subtract(1, 'month')">上月</el-button>
-        <span>{{ currentDate.format('YYYY年MM月') }}</span>
-        <el-button @click="currentDate = dayjs(currentDate).add(1, 'month')">下月</el-button>
-      </div>
-      <div class="weekdays">
-        <div 
-          v-for="(day, index) in ['日', '一', '二', '三', '四', '五', '六']" 
-          :key="day" 
-          class="weekday"
-          :class="{ 'weekend': index === 0 || index === 6 }"
-        >
-          {{ day }}
-        </div>
-      </div>
-      <div class="days">
-        <div
-          v-for="(day, index) in calendarDays"
-          :key="index"
-          class="day"
-          :class="{
-            'current-month': day.isCurrentMonth,
-            'today': day.date.format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD'),
-            'weekend': day.date.day() === 0 || day.date.day() === 6
-          }"
-        >
-          {{ day.date.date() }}
-        </div>
-      </div>
-    </div>
-
-    <!-- 中间时钟和日期信息 -->
-    <div class="clock-section">
-      <el-button 
-        class="fullscreen-btn"
-        @click="toggleFullscreen"
-      >
-        <el-icon class="btn-icon">
-          <component :is="isFullscreen ? Close : FullScreen" />
-        </el-icon>
-        <span class="btn-text">{{ isFullscreen ? '退出全屏' : '全屏' }}</span>
-      </el-button>
-      <div class="center-content">
-        <div class="date-info">
-          <div class="weekday">{{ currentTime.format('dddd') }}</div>
-          <div class="lunar-info">
-            <span class="lunar">{{ lunarInfo }}</span>
-            <span class="solar-term">{{ getSolarTermInfo() }}</span>
-            <span class="holiday">{{ getNextHolidayInfo }}</span>
-          </div>
-        </div>
-        <div class="time-display">
-          <div class="hours-minutes">{{ currentTime.format('HH:mm') }}</div>
-          <div class="seconds">{{ currentTime.format('ss') }}</div>
-        </div>
-        <PomodoroTimer />
-      </div>
-    </div>
-
-    <!-- 右侧待办事项 -->
-    <div class="todo-section">
-      <h2>待办事项</h2>
-      <el-button type="primary" size="small" style="margin-bottom: 10px">添加待办</el-button>
-      <div class="todo-list">
-        <div
-          v-for="todo in todos"
-          :key="todo.id"
-          class="todo-item"
-          :class="{ 'overdue': isOverdue(todo.dueDate) }"
-        >
-          <el-checkbox v-model="todo.completed">{{ todo.content }}</el-checkbox>
-          <div class="due-date">到期: {{ todo.dueDate.format('MM-DD HH:mm') }}</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <style scoped>
 .container {
   display: flex;
   width: 1260px;
   height: 380px;
   padding: 5px;
-  gap: 40px;
+  gap: 10px;
   background: #f5f7fa;
   box-sizing: border-box;
   overflow: hidden;
@@ -226,13 +213,16 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
 
 /* 日历样式 */
 .calendar {
-  flex: 0 0 360px;
+  flex: 0 0 300px;
   background: white;
   padding: 8px;
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .calendar-header {
@@ -306,6 +296,56 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
   color: #ff6666;
 }
 
+.time {
+  font-size: 48px;
+  font-weight: bold;
+  color: #303133;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.date {
+  font-size: 24px;
+  color: #606266;
+  margin-bottom: 4px;
+}
+
+.lunar-info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+  min-height: 24px;
+}
+
+.lunar, .solar-term, .holiday {
+  font-size: 14px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.lunar {
+  background: #f0f9eb;
+  color: #67c23a;
+}
+
+.solar-term {
+  background: #ecf5ff;
+  color: #409eff;
+}
+
+.holiday {
+  background: #fef0f0;
+  color: #f56c6c;
+}
+
+.weekday {
+  font-size: 20px;
+  color: #909399;
+}
+
 /* 时钟部分样式 */
 .clock-section {
   position: relative;
@@ -347,12 +387,6 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
   gap: 10px;
   font-size: 1rem;
   color: #666;
-}
-
-.lunar, .solar-term, .holiday {
-  background: rgba(255, 255, 255, 0.8);
-  padding: 4px 12px;
-  border-radius: 12px;
 }
 
 .time-display {
@@ -404,98 +438,18 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
   transition: all 0.2s ease-out;
 }
 
-/* 待办事项样式 */
-.todo-section {
-  flex: 0 0 260px;
-  background: white;
-  padding: 8px;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.todo-section h2 {
-  margin: 0 0 10px 0;
-  font-size: 16px;
-}
-
-.todo-list {
-  flex: 1;
-  overflow-y: auto;
-  font-size: 14px;
-}
-
-.todo-item {
-  padding: 8px;
-  border-bottom: 1px solid #EBEEF5;
-}
-
-.todo-item:last-child {
-  border-bottom: none;
-}
-
-.due-date {
-  font-size: 12px;
-  color: #909399;
-  margin-top: 4px;
-  margin-left: 24px;
-}
-
-.overdue {
-  color: #F56C6C;
-}
-
-.overdue .due-date {
-  color: #F56C6C;
-}
-
-/* 滚动条样式 */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
 /* 全屏按钮样式 */
 .fullscreen-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 8px 16px;
-  font-size: 14px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #e4e7ed;
-  transition: all 0.3s ease;
-  z-index: 10;
-  min-width: 100px;
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  color: #606266;
+  position: fixed;
+  top: 5px;
+  left: 5px;
+  z-index: 1000;
+  opacity: 0.7;
+  transition: opacity 0.3s;
 }
 
 .fullscreen-btn:hover {
-  background: #409EFF;
-  color: white;
-  border-color: #409EFF;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
+  opacity: 1;
 }
 
 .btn-icon {

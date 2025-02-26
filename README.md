@@ -14,12 +14,22 @@ A secondary work display interface optimized for small screens, providing remind
 ## Features
 
 - 📅 Full-month calendar view with current date highlighting
+  - Weekend days highlighted in red
+  - Current date indicator
+  - Previous/Next month navigation
 - ⏰ Real-time clock display with animations
 - 🌙 Lunar calendar integration
+  - Current lunar date
+  - Solar terms (节气) display
+  - Next holiday countdown
 - ✅ Todo list management with due date tracking
 - 🖥️ Optimized for 1280x400 horizontal displays
 - 🎨 Modern UI with gradient backgrounds and smooth animations
-- 🍅 Pomodoro timer with start/pause and reset functions
+- 🍅 Pomodoro timer
+  - 25-minute countdown timer
+  - Start/Pause functionality
+  - Reset option
+  - Visual timer status indicator
 
 ## Roadmap
 

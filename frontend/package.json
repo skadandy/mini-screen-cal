@@ -9,9 +9,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "type-check": "vue-tsc",
+    "build": "vue-tsc && vite build",
     "preview": "vite preview",
+    "type-check": "vue-tsc",
     "clean": "pnpm clean:build && pnpm clean:deps",
     "clean:build": "rimraf dist",
     "clean:deps": "rimraf node_modules"
