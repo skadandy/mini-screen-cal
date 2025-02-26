@@ -5,6 +5,7 @@ import 'dayjs/locale/zh-cn'
 import { Solar, Lunar } from 'lunar-typescript'
 import { FullScreen, Close } from '@element-plus/icons-vue'
 import PomodoroTimer from './components/PomodoroTimer.vue'
+import { getNextHoliday } from './utils/holidays'
 
 dayjs.locale('zh-cn')
 
@@ -50,44 +51,59 @@ const getSolarTermInfo = () => {
     // 获取下一个节气的阳历日期
     const nextTermSolar = nextTerm.getSolar()
     const nextTermDate = dayjs(new Date(nextTermSolar.getYear(), nextTermSolar.getMonth() - 1, nextTermSolar.getDay()))
-    const days = nextTermDate.diff(today, 'day')
-    return `距离${nextTerm.getName()}还有${days}天`
+    const daysUntil = nextTermDate.diff(today, 'day')
+    return `距离${nextTerm.getName()}还有${daysUntil}天`
   }
   return ''
 }
+
+// 获取下一个节假日信息
+const getNextHolidayInfo = computed(() => {
+  const nextHoliday = getNextHoliday(currentTime.value.toDate())
+  if (nextHoliday) {
+    return `距离${nextHoliday.name}还有${nextHoliday.daysUntil}天`
+  }
+  return ''
+})
 
 // 生成日历数据
 const calendarDays = computed(() => {
   const firstDay = currentDate.value.startOf('month')
   const lastDay = currentDate.value.endOf('month')
   const days = []
+
+  // 获取当月第一天是星期几 (0-6, 0 是星期日)
+  const firstDayOfWeek = firstDay.day()
   
-  // 填充上个月的日期
-  const firstDayWeek = firstDay.day()
-  for (let i = firstDayWeek - 1; i >= 0; i--) {
+  // 添加上个月的日期
+  const prevMonthLastDay = firstDay.subtract(1, 'day')
+  for (let i = firstDayOfWeek - 1; i >= 0; i--) {
     days.push({
-      date: firstDay.subtract(i + 1, 'day'),
+      date: prevMonthLastDay.subtract(i, 'day'),
       isCurrentMonth: false
     })
   }
-  
-  // 当月日期
-  for (let i = 0; i < lastDay.date(); i++) {
+
+  // 添加当月的日期
+  let currentDay = firstDay
+  while (currentDay.isBefore(lastDay) || currentDay.isSame(lastDay, 'day')) {
     days.push({
-      date: firstDay.add(i, 'day'),
+      date: currentDay,
       isCurrentMonth: true
     })
+    currentDay = currentDay.add(1, 'day')
   }
-  
-  // 填充下个月的日期
-  const remainingDays = 42 - days.length // 保持6行
+
+  // 添加下个月的日期，补齐到42个格子（6行7列）
+  const remainingDays = 42 - days.length
+  let nextMonthDay = lastDay.add(1, 'day')
   for (let i = 0; i < remainingDays; i++) {
     days.push({
-      date: lastDay.add(i + 1, 'day'),
+      date: nextMonthDay.add(i, 'day'),
       isCurrentMonth: false
     })
   }
-  
+
   return days
 })
 
@@ -123,7 +139,12 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
         <el-button @click="currentDate = dayjs(currentDate).add(1, 'month')">下月</el-button>
       </div>
       <div class="weekdays">
-        <div v-for="day in ['一', '二', '三', '四', '五', '六', '日']" :key="day" class="weekday">
+        <div 
+          v-for="(day, index) in ['日', '一', '二', '三', '四', '五', '六']" 
+          :key="day" 
+          class="weekday"
+          :class="{ 'weekend': index === 0 || index === 6 }"
+        >
           {{ day }}
         </div>
       </div>
@@ -134,7 +155,8 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
           class="day"
           :class="{
             'current-month': day.isCurrentMonth,
-            'today': day.date.format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')
+            'today': day.date.format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD'),
+            'weekend': day.date.day() === 0 || day.date.day() === 6
           }"
         >
           {{ day.date.date() }}
@@ -159,6 +181,7 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
           <div class="lunar-info">
             <span class="lunar">{{ lunarInfo }}</span>
             <span class="solar-term">{{ getSolarTermInfo() }}</span>
+            <span class="holiday">{{ getNextHolidayInfo }}</span>
           </div>
         </div>
         <div class="time-display">
@@ -241,6 +264,10 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
   font-size: 14px;
 }
 
+.weekend {
+  color: #ff9999;
+}
+
 .days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -273,6 +300,10 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
 .today {
   background-color: #409EFF;
   color: white !important;
+}
+
+.weekend.current-month {
+  color: #ff6666;
 }
 
 /* 时钟部分样式 */
@@ -318,7 +349,7 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
   color: #666;
 }
 
-.lunar, .solar-term {
+.lunar, .solar-term, .holiday {
   background: rgba(255, 255, 255, 0.8);
   padding: 4px 12px;
   border-radius: 12px;
@@ -476,5 +507,9 @@ const isOverdue = (dueDate: dayjs.Dayjs) => {
   text-align: center;
   white-space: nowrap;
   color: currentColor;
+}
+
+.holiday {
+  color: #666;
 }
 </style>
